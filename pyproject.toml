@@ -1,0 +1,71 @@
+[project]
+# 项目元数据
+name = "rm-armor-cnn"
+version = "0.1.0"
+description = "RoboMaster 装甲板数字识别 CNN 训练框架"
+readme = "README.md"
+
+# Python 版本约束：
+# 限制在 <3.10
+requires-python = ">=3.10, <3.11" 
+
+authors = [
+    { name = "Kielas", email = "c1470759@outlook.com" }
+]
+
+# 核心运行依赖：项目运行必须安装的包
+dependencies = [
+    "numpy>=1.24.0",
+    "opencv-python>=4.8.0",
+    "pyyaml>=6.0",
+    "pathlib>=1.0.1",
+    "scikit-learn>=1.3.0",
+    "pandas>=2.0.0",
+    "torch>=2.2.0",        # 确保版本支持 CUDA 12.1 和新架构显卡
+    "torchvision>=0.17.0",
+]
+
+[project.optional-dependencies]
+# 可选依赖：通过 uv sync --extra deploy 安装
+# 用于模型导出到 ONNX 并在 OpenVINO/TensorRT 上部署
+deploy = [
+    "onnx>=1.14.0",
+    "onnxscript",      # 推荐：新的 ONNX 转换工具，兼容性更好
+    "onnxsim>=0.4.33", # 保持现状，或改为 "onnxsim" (不指定版本)
+    "torchsummary>=1.5.1",
+]
+# 开发调试工具：通过 uv sync --extra dev 安装
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.7.0",
+]
+
+[build-system]
+# 使用 hatchling 作为构建后端，负责处理包的打包和安装
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# 构建工具配置
+[tool.hatch.build.targets.wheel]
+# 关键修复：默认情况下 hatch 寻找项目名命名的文件夹（如 rm_armor_cnn）
+# 设置为 ["."] 表示项目源码直接就在根目录下，解决 build 失败的问题
+packages = ["."]
+
+[tool.uv]
+# 默认索引：使用清华镜像源加速国内下载
+index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+# 额外索引链接：指定 PyTorch 官方的 CUDA 12.1 专用仓库
+extra-index-url = ["https://download.pytorch.org/whl/cu121"]
+
+[tool.uv.sources]
+# 强制指定 torch 相关包从下方的 pytorch-cu121 索引下载，避免误装 CPU 版本
+torch = { index = "pytorch-cu121" }
+torchvision = { index = "pytorch-cu121" }
+
+[[tool.uv.index]]
+# 定义名为 pytorch-cu121 的索引
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+# explicit = true 表示只有在上方 sources 明确指定时才使用此索引，防止污染其他包的下载路径
+explicit = true
