@@ -1,0 +1,37 @@
+# ============================================================
+# RoboMaster 装甲板分类器配置文件 (CNN Training Config)
+# ============================================================
+
+model_info:
+  name: "RM_Armor_CNN"
+  input_size: [20, 28] 
+  num_classes: 4
+  batch_size: 64
+  learning_rate: 0.001
+  epochs: 50
+  device: "cpu"
+
+# ================= 新增：数据集划分策略 =================
+dataset_split:
+  use_validation: true       # 是否启用验证集 (True: 训练中评估, False: 全量训练)
+  use_test: true             # 是否预留测试集 (用于训练彻底结束后做最终能力评估)
+  # 划分比例 [Train, Val, Test]。注意：即使不启用，这里的数字加起来也最好是 1.0
+  ratios: [0.8, 0.1, 0.1]    
+
+# 数据增强详细参数
+augmentation:
+  rotation_degree: 15          
+  scale_min: 0.8               
+  scale_max: 1.1               
+  ratio_min: 0.7               
+  ratio_max: 1.3               
+  erasing_p: 0.5               
+  erasing_scale: [0.02, 0.1]   
+  binary_threshold: 0.5        
+
+# 类别索引与实际业务逻辑的映射关系
+class_names:
+  0: "hero"
+  1: "infantry"
+  2: "sentry"
+  3: "negative"

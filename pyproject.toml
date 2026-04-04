@@ -6,7 +6,7 @@ description = "RoboMaster 装甲板数字识别 CNN 训练框架"
 readme = "README.md"
 
 # Python 版本约束：
-# 限制在 <3.10
+# 限制在 <3.11
 requires-python = ">=3.10, <3.11" 
 
 authors = [
@@ -15,14 +15,19 @@ authors = [
 
 # 核心运行依赖：项目运行必须安装的包
 dependencies = [
-    "numpy>=1.24.0",
+    "numpy>=1.24.0,<2.0.0",  # 强制限制在 2.0 以下
     "opencv-python>=4.8.0",
     "pyyaml>=6.0",
     "pathlib>=1.0.1",
     "scikit-learn>=1.3.0",
     "pandas>=2.0.0",
-    "torch>=2.2.0",        # 确保版本支持 CUDA 12.1 和新架构显卡
+    "torch>=2.2.0",
     "torchvision>=0.17.0",
+    "matplotlib>=3.8.0",     
+    "ipywidgets>=8.0.0",      
+    "ipykernel>=6.15.0",
+    "tqdm>=4.66.1",
+    "tensorboard>=2.15.0",   # 新增：用于训练过程可视化
 ]
 
 [project.optional-dependencies]
@@ -30,10 +35,12 @@ dependencies = [
 # 用于模型导出到 ONNX 并在 OpenVINO/TensorRT 上部署
 deploy = [
     "onnx>=1.14.0",
-    "onnxscript",      # 推荐：新的 ONNX 转换工具，兼容性更好
-    "onnxsim>=0.4.33", # 保持现状，或改为 "onnxsim" (不指定版本)
+    "onnxscript",      
+    "onnxsim>=0.4.33", 
     "torchsummary>=1.5.1",
+    "onnxruntime>=1.16.0",   # 新增：用于执行 INT8 动态量化
 ]
+
 # 开发调试工具：通过 uv sync --extra dev 安装
 dev = [
     "pytest>=7.4.0",
@@ -45,27 +52,24 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-# 构建工具配置
 [tool.hatch.build.targets.wheel]
-# 关键修复：默认情况下 hatch 寻找项目名命名的文件夹（如 rm_armor_cnn）
-# 设置为 ["."] 表示项目源码直接就在根目录下，解决 build 失败的问题
+# 设置为 ["."] 表示项目源码直接就在根目录下
 packages = ["."]
 
 [tool.uv]
 # 默认索引：使用清华镜像源加速国内下载
 index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 
-# 额外索引链接：指定 PyTorch 官方的 CUDA 12.1 专用仓库
-extra-index-url = ["https://download.pytorch.org/whl/cu121"]
+# 额外索引链接：已升级至 CUDA 12.4 专用仓库以兼容 RTX 50 系列显卡 (sm_120)
+extra-index-url = ["https://download.pytorch.org/whl/cu124"]
 
 [tool.uv.sources]
-# 强制指定 torch 相关包从下方的 pytorch-cu121 索引下载，避免误装 CPU 版本
-torch = { index = "pytorch-cu121" }
-torchvision = { index = "pytorch-cu121" }
+# 强制指定 torch 相关包从下方的 pytorch-cu124 索引下载
+torch = { index = "pytorch-cu124" }
+torchvision = { index = "pytorch-cu124" }
 
 [[tool.uv.index]]
-# 定义名为 pytorch-cu121 的索引
-name = "pytorch-cu121"
-url = "https://download.pytorch.org/whl/cu121"
-# explicit = true 表示只有在上方 sources 明确指定时才使用此索引，防止污染其他包的下载路径
+# 定义名为 pytorch-cu124 的索引
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
 explicit = true
