@@ -1,11 +1,15 @@
-# KIELAS_Armor_CNN_Train
-rm装甲板识别模型（CNN分类器）
+# RM_KielasVison_classifier_MLP_Training
+
+梓喵的装甲板信息模型训练代码
+
+<img src="rm_vision.svg" alt="rm_vision" width="200" height="200">
+
 
 ## 使用 CIFAR-100 作为负样本
 
 下载地址：https://www.cs.toronto.edu/~kriz/cifar.html
 
-下载解压后，使用 process_cifra100.py 对其进行处理
+下载解压后，使用 [process_cifra100.py](process_cifra100.py) 对其进行处理
 
 ## 装甲板图案数据采集
 
@@ -30,16 +34,19 @@ rm装甲板识别模型（CNN分类器）
             bag3.2 -> middle
              bag3.3 -> far
     # 啥也不是 bag4
-    python3 ./src/extract_bag_bin.py ./armor_bag1 ./data/raw/1/
+    python3 ./training_scripts/extract_bag_bin.py ./armor_bag1 ./datasets/1/
     ```
 
 5. 按照下列结构放置图片作为数据集
 
     ```
-    data/raw
+    datasets
     ├─1 -1 == 1
     ├─2 -1 == 3
     ├─3 -1 == 哨兵
     ├─4negative -1 == 啥也不是
     ```
-6. 原始数据集请将其放在 `data/raw` 文件夹下
+
+## 训练
+
+运行 [mlp_training.py](mlp_training.py)
